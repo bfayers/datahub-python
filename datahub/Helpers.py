@@ -1,3 +1,5 @@
+from datetime import datetime
+
 weather_codes = {
     0: "Clear night",
     1: "Sunny day",
@@ -31,3 +33,20 @@ weather_codes = {
     29: "Thunder shower (day)",
     30: "Thunder"
 }
+
+def split_days(data):
+    new_data = []
+    for i in range(0,len(data)):
+        if i == 0:
+            day = [data[i]]
+        else:
+            #Get previoues time block day
+            previous_day = datetime.strptime(data[i-1]['time'], "%Y-%m-%dT%H:%MZ").day
+            #Get current time block day
+            current_day = datetime.strptime(data[i]['time'], "%Y-%m-%dT%H:%MZ").day
+            if current_day == previous_day:
+                day.append(data[i])
+            else:
+                new_data.append(day)
+                day = []
+    return new_data
