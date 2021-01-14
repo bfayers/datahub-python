@@ -106,15 +106,10 @@ class Forecast():
                 for hour in day:
                     hour_time = datetime.strptime(hour['time'], "%Y-%m-%dT%H:%MZ")
                     #1.5 hour before target & 1.5hour after target if hourly, 3.5hour if three-hourly
-                    if self.frequency == "hourly":
-                        start = target_time - timedelta(hours=1, minutes=30)
-                        end = target_time + timedelta(hours=1, minutes=30)
-                    elif self.frequency == "three-hourly":
-                        start = target_time - timedelta(hours=3, minutes=30)
-                        end = target_time + timedelta(hours=3, minutes=30)
-                    
+                    start = target_time - timedelta(hours=1 if self.frequency == "hourly" else 3, minutes=30)
+                    end = target_time + timedelta(hours=1 if self.frequency == "hourly" else 3, minutes=30)
+
                     if start <= hour_time <= end:
-                        print(abs(hour_time-target_time))
                         hour['delta'] = abs(hour_time-target_time)
                         potential_responses.append(hour)
             seq = [x['delta'] for x in potential_responses]
