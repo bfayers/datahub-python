@@ -1,5 +1,5 @@
 from datahub.Helpers import weather_codes, split_days
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Forecast():
     def __init__(self, frequency=None, response=None):
@@ -100,5 +100,22 @@ class Forecast():
                     #Matched date
                     return day
         else:
-            #It's an hourly or three-hourly will have to check all timeslots
-            for day in self.days
+            #Find all steps within 1.5 hours (four hourly) / 3.5 hours (for three hourly)
+            potential_responses = []
+            for day in self.days:
+                for hour in day:
+                    hour_time = datetime.strptime(hour['time'], "%Y-%m-%dT%H:%MZ")
+                    #1.5 hour before target & 1.5hour after target if hourly, 3.5hour if three-hourly
+                    if self.frequency == "hourly":
+                        start = target_time - timedelta(hours=1, minutes=30)
+                        end = target_time + timedelta(hours=1, minutes=30)
+                    elif self.frequency == "three-hourly":
+                        start = target_time - timedelta(hours=3, minutes=30)
+                        end = target_time + timedelta(hours=3, minutes=30)
+                    
+                    if start <= hour_time <= end:
+                        print(abs(hour_time-target_time))
+                        hour['delta'] = abs(hour_time-target_time)
+                        potential_responses.append(hour)
+            seq = [x['delta'] for x in potential_responses]
+            return potential_responses[seq.index(min(seq))]
