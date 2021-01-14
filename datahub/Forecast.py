@@ -1,5 +1,5 @@
 from datahub.Helpers import weather_codes, split_days
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Forecast():
     def __init__(self, frequency=None, response=None):
@@ -79,3 +79,41 @@ class Forecast():
                     if frequency == "hourly":
                         #Change "significantWeatherCode" to "significantWeather"
                         hour['significantWeather'] = weather_codes[hour.pop('significantWeatherCode')]
+    
+    def at_time(self, target_time=None):
+        """Find data for closest to datetime given"""
+        if target_time is None:
+            #You need to specify a time
+            raise Exception("No target_time specified")
+        elif not isinstance(target_time, datetime):
+            #Time needs to be specified as a datetime
+            raise Exception("target_time is not a datetime")
+
+        if self.frequency == "daily":
+            #Only a daily frequency - just need to match the day to the target
+            for day in self.days:
+                day_date = datetime.strptime(day['time'], "%Y-%m-%dT%H:%MZ")
+                if day_date.date() == target_time.date():
+                    #Matched date
+                    return day
+        else:
+            #Find all steps within 1.5 hours (four hourly) / 3.5 hours (for three hourly)
+            potential_responses = []
+            for day in self.days:
+                for hour in day:
+                    hour_time = datetime.strptime(hour['time'], "%Y-%m-%dT%H:%MZ")
+                    #1.5 hour before target & 1.5hour after target if hourly, 3.5hour if three-hourly
+                    start = target_time - timedelta(hours=1 if self.frequency == "hourly" else 3, minutes=30)
+                    end = target_time + timedelta(hours=1 if self.frequency == "hourly" else 3, minutes=30)
+
+                    if start <= hour_time <= end:
+                        hour['delta'] = abs(hour_time-target_time)
+                        potential_responses.append(hour)
+            #Find all delta values
+            seq = [x['delta'] for x in potential_responses]
+            #Return potential response with lowest delta
+            return potential_responses[seq.index(min(seq))]
+    
+    def now(self):
+        """Call at_time with datetime.now()"""
+        return self.at_time(datetime.now())
