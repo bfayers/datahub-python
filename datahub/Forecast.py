@@ -89,9 +89,6 @@ class Forecast():
             #Time needs to be specified as a datetime
             raise Exception("target_time is not a datetime")
 
-        #Convert target time to integer
-        #target_time = int(target_time.timestamp())
-
         if self.frequency == "daily":
             #Only a daily frequency - just need to match the day to the target
             for day in self.days:
