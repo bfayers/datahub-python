@@ -112,5 +112,11 @@ class Forecast():
                     if start <= hour_time <= end:
                         hour['delta'] = abs(hour_time-target_time)
                         potential_responses.append(hour)
+            #Find all delta values
             seq = [x['delta'] for x in potential_responses]
+            #Return potential response with lowest delta
             return potential_responses[seq.index(min(seq))]
+    
+    def now(self):
+        """Call at_time with datetime.now()"""
+        return self.at_time(datetime.now())
