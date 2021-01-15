@@ -7,6 +7,6 @@ Work in progress Python library for MetOffice DataHub (replacing datapoint)
 import datahub
 conn = datahub.connection("clientID", "clientSecret")
 
-forecast = conn.get_forecast(frequency="daily", latitude="latitude", longitude="longitude")
+forecast = conn.get_forecast(frequency="daily|hourly|three-hourly", latitude="latitude", longitude="longitude")
 print(forecast.days)
 ```
