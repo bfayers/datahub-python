@@ -2,22 +2,20 @@ from datahub.Helpers import weather_codes, split_days
 from datetime import datetime, timedelta
 
 class Forecast():
-    def __init__(self, frequency=None, response=None):
+    def __init__(self, frequency=None, data=None):
         if frequency is None:
             raise Exception("No frequency provided")
-        if response is None:
-            raise Exception("No response provided")
+        if data is None:
+            raise Exception("No data provided")
         self.frequency = frequency
-        if response.status_code != 200:
-            raise Exception("Response not OK")
         
-        self.response = response.json()
+        self.data = data
 
         #Format incoming response
         self.days = []
         if frequency == "daily":
             #Format for daily frequency
-            for day in self.response['features'][0]['properties']['timeSeries']:
+            for day in self.data['features'][0]['properties']['timeSeries']:
                 self.days.append({
                     "time": day['time'],
                     "daySignificantWeather": weather_codes[day['daySignificantWeatherCode']],
@@ -67,7 +65,7 @@ class Forecast():
                 })
         else:
             #Split hourly and three hourly time series into days
-            time_series = self.response['features'][0]['properties']['timeSeries']
+            time_series = self.data['features'][0]['properties']['timeSeries']
             self.days = split_days(time_series)
 
             #Convert mslp to hPa

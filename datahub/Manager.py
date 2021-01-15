@@ -23,4 +23,7 @@ class Manager():
 
         url = self.base_url.format(frequency, latitude, longitude)
         response = requests.get(url, headers=self.headers)
-        return Forecast(frequency=frequency, response=response)
+        if response.status_code != 200:
+            raise Exception("Response not OK")
+        data = response.json()
+        return Forecast(frequency=frequency, data=data)
