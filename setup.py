@@ -7,4 +7,5 @@ setup(
     description='MetOffice DataHub Library',
     author='bfayers',
     license='GPLv3',
+    install_requires=["requests>=2.25.1"],
 )
